@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import os
 import tensorflow as tf
-from keras.api._v2.keras.preprocessing.image import img_to_array
 
 # model_path = "path_to_model/model.h"
 # loaded_model = tf.keras.models.load_model(model_path)
@@ -54,6 +53,7 @@ def extract_frames(video_path, output_folder, model):
         # If the predicted class indicates the character is present,
         # save the frame
         if predicted_class > 0.5:
+            print(f"Predicted class is {predicted_class}")
             frame_path = os.path.join(output_folder, f"frame_{frame_count}.png")  # noqa
             cv2.imwrite(frame_path, frame)
 

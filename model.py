@@ -1,6 +1,8 @@
 import tensorflow as tf
 from keras.api._v2.keras import layers, models
 from keras.api._v2.keras.preprocessing.image import ImageDataGenerator
+from keras.api._v2.keras.optimizers import Adam
+from keras.api._v2.keras.regularizers import l2
 import os
 
 # noqa: E501
@@ -34,7 +36,17 @@ parent_dir = "training_data"
 
 
 # Load and preprocess labeled data
-train_datagen = ImageDataGenerator(validation_split=0.2, rescale=1.0 / 255)
+train_datagen = ImageDataGenerator(
+    validation_split=0.2,
+    rescale=1.0 / 255,
+    rotation_range=10,  # Reduced rotation range
+    width_shift_range=0.1,  # Reduced shift range
+    height_shift_range=0.1,  # Reduced shift range
+    shear_range=0.1,  # Reduced shear range
+    zoom_range=0.1,  # Reduced zoom range
+    horizontal_flip=True,  # Kept horizontal flip
+    fill_mode="nearest",
+)
 train_generator = train_datagen.flow_from_directory(
     parent_dir,
     target_size=(224, 224),
@@ -57,12 +69,18 @@ base_model = tf.keras.applications.MobileNetV2(
 base_model.trainable = False
 
 pooling_layer = layers.GlobalAveragePooling2D()
-dense_layer = layers.Dense(1, activation="sigmoid")
+dense_layer = layers.Dense(1, activation="sigmoid", kernel_regularizer=l2(0.01))  # noqa
 model = models.Sequential([base_model, pooling_layer, dense_layer])
+
+# Set custom learning rate
+custom_learning_rate = 0.0001
+
+# Create an instance of the Adam optimizer with the custom learning rate
+optimizer = Adam(learning_rate=custom_learning_rate)
 
 # Compile the model
 model.compile(
-    optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]
+    optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"]
 )  # noqa
 
 # Train the model
