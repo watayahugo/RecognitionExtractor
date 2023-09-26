@@ -45,10 +45,7 @@ conda activate vidextract
    python model.py
    ```
 
-````
-
 3. **Extract Frames:**
    ```bash
    python extractor.py
    ```
-````
