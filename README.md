@@ -1,4 +1,7 @@
 # RecognitionExtractor
+## About
+Specialized implementation of computer vision and deep learning techniques aimed at extracting specific frames from a video where a designated character / person appears. Utilizing TensorFlow, this project employs a fine-tuned neural network model to analyze each frame of the input video and determine the presence of the target character. The model is trained using a pre-trained MobileNetV2 as the base model, with additional pooling and dense layers. The training process involves data augmentation, normalization, and binary cross-entropy loss. The extractor script analyzes each frame of the input video, predicts the presence of the character, and saves frames where the character is detected.
+
 
 ## Installation
 ```
@@ -12,11 +15,10 @@ git clone https://github.com/watayahugo/RecognitionExtractor.git
 
 2. **Train Model:**
    ```bash
-   python train_model.py
+   python model.py
    ```
 
-## Model Training
-The model is trained using a pre-trained MobileNetV2 as the base model, with additional pooling and dense layers. The training process involves data augmentation, normalization, and binary cross-entropy loss.
-
-## Frame Analysis
-The script analyzes each frame of the input video, predicts the presence of the character, and saves frames where the character is detected. It efficiently skips similar frames to reduce redundancy.
+3. **Extract Frames:**
+   ```bash
+   python extractor.py
+   ```
