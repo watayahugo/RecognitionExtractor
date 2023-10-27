@@ -2,9 +2,16 @@ import cv2
 import numpy as np
 import os
 import tensorflow as tf
+import configparser
 
-# model_path = "path_to_model/model.h"
-# loaded_model = tf.keras.models.load_model(model_path)
+# Read configuration file
+config = configparser.ConfigParser()
+config.read("config.cfg")
+
+# Retrieve parameters from configuration file
+frame_interval = int(config["EXTRACT"]["FrameInterval"])
+prediction_leniency = float(config["EXTRACT"]["PredictionLeniency"])
+video_input = str(config["VIDEO"]["VideoName"])
 
 
 def preprocess_frame(frame):
@@ -30,10 +37,9 @@ def predict_frame(frame, model):
     # Make a prediction using the model
     prediction = model.predict(preprocessed_frame)
 
-    # Convert prediction to class label, assuming binary classification
-    predicted_class = (prediction > 0.5).astype("int32")
+    print(f"The current prediction ratio is {prediction}")
 
-    return predicted_class
+    return prediction
 
 
 def extract_frames(video_path, output_folder, model):
@@ -52,12 +58,11 @@ def extract_frames(video_path, output_folder, model):
 
         # If the predicted class indicates the character is present,
         # save the frame
-        if predicted_class > 0.5:
-            print(f"Predicted class is {predicted_class}")
+        if predicted_class > prediction_leniency:
             frame_path = os.path.join(output_folder, f"frame_{frame_count}.png")  # noqa
             cv2.imwrite(frame_path, frame)
 
-        frame_count += 2
+        frame_count += frame_interval
     cap.release()
 
 
@@ -67,6 +72,6 @@ model = tf.keras.models.load_model(model_path)
 
 # Call the extract_frames function with the video path,
 # output folder, and the loaded model
-video_path = "vid.mkv"
+video_path = video_input
 output_folder = "frames"
 extract_frames(video_path, output_folder, model)

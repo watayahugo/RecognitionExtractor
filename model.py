@@ -4,10 +4,22 @@ from keras.api._v2.keras.preprocessing.image import ImageDataGenerator
 from keras.api._v2.keras.optimizers import Adam
 from keras.api._v2.keras.regularizers import l2
 import os
+import configparser
 
 # noqa: E501
 
+# Read configuration file
+config = configparser.ConfigParser()
+config.read("config.cfg")
+
+# Retrieve parameters from configuration file
+validation_split = float(config["TRAINING"]["ValidationSplit"])
+batch_size = int(config["TRAINING"]["BatchSize"])
+custom_learning_rate = float(config["TRAINING"]["LearningRate"])
+epochs = int(config["TRAINING"]["Epochs"])
+
 # Define the path to folders
+parent_dir = "training_data"
 pos_folder = "training_data/positive"
 neg_folder = "training_data/negative"
 models_folder = "models"
@@ -19,6 +31,7 @@ neg_exists = os.path.exists(neg_folder)
 models_exists = os.path.exists(models_folder)
 
 # Create the positive and negative folders if they don't exist
+# As well as the character recognition model
 os.makedirs(pos_folder, exist_ok=True)
 os.makedirs(neg_folder, exist_ok=True)
 os.makedirs(models_folder, exist_ok=True)
@@ -32,12 +45,10 @@ if not pos_exists or not neg_exists or not models_exists:
     )
     exit()
 
-parent_dir = "training_data"
-
 
 # Load and preprocess labeled data
 train_datagen = ImageDataGenerator(
-    validation_split=0.2,
+    validation_split,
     rescale=1.0 / 255,
     rotation_range=10,  # Reduced rotation range
     width_shift_range=0.1,  # Reduced shift range
@@ -50,14 +61,14 @@ train_datagen = ImageDataGenerator(
 train_generator = train_datagen.flow_from_directory(
     parent_dir,
     target_size=(224, 224),
-    batch_size=2,
+    batch_size=batch_size,
     class_mode="binary",
     subset="training",
 )
 validation_generator = train_datagen.flow_from_directory(
     parent_dir,
     target_size=(224, 224),
-    batch_size=2,
+    batch_size=batch_size,
     class_mode="binary",
     subset="validation",
 )
@@ -72,9 +83,6 @@ pooling_layer = layers.GlobalAveragePooling2D()
 dense_layer = layers.Dense(1, activation="sigmoid", kernel_regularizer=l2(0.01))  # noqa
 model = models.Sequential([base_model, pooling_layer, dense_layer])
 
-# Set custom learning rate
-custom_learning_rate = 0.0001
-
 # Create an instance of the Adam optimizer with the custom learning rate
 optimizer = Adam(learning_rate=custom_learning_rate)
 
@@ -84,6 +92,6 @@ model.compile(
 )  # noqa
 
 # Train the model
-model.fit(train_generator, validation_data=validation_generator, epochs=15)
+model.fit(train_generator, validation_data=validation_generator, epochs=epochs)
 
 model.save(model_path)
