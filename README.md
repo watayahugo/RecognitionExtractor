@@ -4,6 +4,7 @@
 
 Specialized implementation of computer vision and deep learning techniques aimed at extracting specific frames from a video where a designated character / person appears. Utilizing TensorFlow, this project employs a fine-tuned neural network model to analyze each frame of the input video and determine the presence of the target character. The model is trained using a pre-trained MobileNetV2 as the base model, with additional pooling and dense layers. The training process involves data augmentation, normalization, and binary cross-entropy loss. The extractor script analyzes each frame of the input video, predicts the presence of the character, and saves frames where the character is detected.
 
+
 ## Installation
 
 1. Clone the repository
@@ -32,6 +33,7 @@ conda env list
 conda activate vidextract
 ```
 
+
 ## Usage
 
 > **_NOTE:_** Depending on the training data available to the model, it may be beneficial to change a few of the parameters located in the `config.cfg` file **prior** to training the model and running the extraction script. (Learning rate, Prediction leniency, Validation split, Epochs, etc.) See **Training / Extraction Parameters** below for more details.
@@ -57,6 +59,10 @@ conda activate vidextract
    ```bash
    python extractor.py
    ```
+
+
+> **_CAUTION:_** As the extractor script saves **uncompressed** images directly from the video file, depending on the length and quality of the video, file sizes may get **very large**.
+
 
 ## Training / Extraction Parameters
 
