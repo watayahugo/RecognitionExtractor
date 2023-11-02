@@ -61,7 +61,7 @@ conda activate vidextract
    ```
 
 
-> **_CAUTION:_** As the extractor script saves **uncompressed** images directly from the video file, depending on the length and quality of the video, file sizes may get **very large**.
+> **_CAUTION:_** File sizes may get **very large** as the extractor script saves **uncompressed** images directly from the video file. (This depends on the quality and length of the input video)
 
 
 ## Training / Extraction Parameters
